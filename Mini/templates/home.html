@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="hero">
+    <h1>🎟️ EventHub</h1>
+    <p class="hero-sub">Discover, book and manage events — all in one place. No double bookings, no confusion.</p>
+    <div class="hero-btns">
+        <a href="/register"><button>Get Started</button></a>
+        <a href="/login"><button class="btn-outline">Login</button></a>
+    </div>
+</div>
+
+<div class="features-grid">
+    <div class="card feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Browse Events</h3>
+        <p>Explore conferences, concerts, meetups and more — all in one place.</p>
+    </div>
+    <div class="card feature-card">
+        <div class="feature-icon">🚫</div>
+        <h3>No Double Booking</h3>
+        <p>Our system prevents you from booking the same event twice automatically.</p>
+    </div>
+    <div class="card feature-card">
+        <div class="feature-icon">💺</div>
+        <h3>Live Seat Tracking</h3>
+        <p>See available seats in real time. Events lock automatically when full.</p>
+    </div>
+    <div class="card feature-card">
+        <div class="feature-icon">📋</div>
+        <h3>Booking History</h3>
+        <p>View and manage all your bookings from your personal dashboard.</p>
+    </div>
+    <div class="card feature-card">
+        <div class="feature-icon">❌</div>
+        <h3>Easy Cancellation</h3>
+        <p>Cancel any booking anytime with a single click — no hassle.</p>
+    </div>
+    <div class="card feature-card">
+        <div class="feature-icon">🔐</div>
+        <h3>Secure Access</h3>
+        <p>Your account is protected with encrypted passwords and session auth.</p>
+    </div>
+</div>
+
+<div class="categories-section">
+    <h2>Event Categories</h2>
+    <div class="categories-row">
+        <div class="category-pill">🎤 Concerts</div>
+        <div class="category-pill">🧑‍💻 Tech Meetups</div>
+        <div class="category-pill">🏢 Conferences</div>
+        <div class="category-pill">📸 Masterclasses</div>
+        <div class="category-pill">😂 Comedy Nights</div>
+        <div class="category-pill">💼 Business Events</div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <h2>Ready to get started?</h2>
+    <p>Join hundreds of people already booking events on EventHub.</p>
+    <a href="/register"><button>Create Free Account</button></a>
+</div>
+
+{% endblock %}

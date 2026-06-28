@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <div>
+        <h2>Welcome back, {{ current_user.username }} 👋</h2>
+        <p>Here's everything you need to manage your events.</p>
+    </div>
+
+</div>
+
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon">🎟️</div>
+        <div class="stat-info">
+            <div class="stat-num">{{ current_user.bookings|length }}</div>
+            <div class="stat-label">Total Bookings</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+            <div class="stat-num">
+                {{ current_user.bookings|selectattr('status','equalto','confirmed')|list|length }}
+            </div>
+            <div class="stat-label">Confirmed</div>
+        </div>
+    </div>
+  
+    <div class="stat-card">
+        <div class="stat-icon">🗓️</div>
+        <div class="stat-info">
+            <div class="stat-num">{{ event_count }}</div>
+            <div class="stat-label">Events Available</div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <div class="card dash-card">
+        <div class="dash-card-header">
+            <h3>🎯 Quick Actions</h3>
+        </div>
+        <div class="quick-actions">
+            <a href="/sessions/">
+                <div class="action-item">
+                    <span>🔍</span>
+                    <div>
+                        <strong>Browse Events</strong>
+                        <p>See all available events and book your seat</p>
+                    </div>
+                </div>
+            </a>
+            <a href="/bookings">
+                <div class="action-item">
+                    <span>📋</span>
+                    <div>
+                        <strong>My Bookings</strong>
+                        <p>View and manage your booked events</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="card dash-card">
+        <div class="dash-card-header">
+            <h3>📌 Recent Bookings</h3>
+            <a href="/bookings" class="see-all">See all</a>
+        </div>
+        {% if current_user.bookings %}
+            {% for booking in current_user.bookings[-3:] %}
+            <div class="recent-booking-item">
+                <div>
+                    <strong>{{ booking.event.title }}</strong>
+                    <p>{{ booking.event.date.strftime('%B %d, %Y') }}</p>
+                </div>
+                <span class="status-badge {{ booking.status }}">
+                    {{ booking.status }}
+                </span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>🎟️ You haven't booked any events yet.</p>
+                <a href="/events/"><button>Browse Events</button></a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

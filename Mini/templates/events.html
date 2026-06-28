@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Available Events</h2>
+
+{% for c in events %}
+<div class="card">
+    <h3>{{ c.title }}</h3>
+    <p>{{ c.description }}</p>
+    <p>📍 {{ c.location }}</p>
+    <p>📅 {{ c.date.strftime('%B %d, %Y at %I:%M %p') }}</p>
+    <p>🎟️ Category: {{ c.category }}</p>
+    <p>💺 Capacity: {{ c.capacity }}</p>
+
+    {% if c.id in booked_event_ids %}
+        <span class="badge booked">✅ Booked</span>
+    {% else %}
+        <button onclick="bookEvent({{ c.id }})">Book</button>
+    {% endif %}
+</div>
+{% endfor %}
+
+<p id="message"></p>
+
+<script>
+function bookEvent(eventId) {
+    fetch("/api/bookings", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            event_id: eventId
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("message").innerText = data.message || data.error;
+        location.reload();
+    });
+}
+</script>
+
+{% endblock %}
