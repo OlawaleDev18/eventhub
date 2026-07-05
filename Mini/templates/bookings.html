@@ -2,23 +2,68 @@
 
 {% block content %}
 
-<h2>Your Bookings</h2>
+<h2>My Bookings</h2>
 
-{% for booking in bookings %}
-<div class="card">
-    <p>Event: {{ booking.event.title }}</p>
-</div>
-{% endfor %}
+{% if bookings %}
+    {% for booking in bookings %}
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+            <div>
+                <h3 style="margin: 0 0 8px;">{{ booking.event.title }}</h3>
+                <p style="margin: 4px 0;">📍 {{ booking.event.location }}</p>
+                <p style="margin: 4px 0;">📅 {{ booking.event.date.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                <p style="margin: 4px 0;">🎯 {{ booking.event.category }}</p>
+                <p style="margin: 8px 0 0;">
+                    Status: <span class="status-badge {{ booking.status }}">{{ booking.status }}</span>
+                </p>
+            </div>
+            {% if booking.status == 'confirmed' %}
+            <button
+                onclick="cancelBooking({{ booking.id }}, this)"
+                style="background: linear-gradient(135deg, #ef4444, #dc2626); align-self: center;">
+                Cancel Booking
+            </button>
+            {% else %}
+            <span style="color: #f87171; font-size: 13px; align-self: center;">Cancelled</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <p>🎟️ You have no bookings yet.</p>
+        <a href="/events/"><button>Browse Events</button></a>
+    </div>
+{% endif %}
+
+<p id="message" style="text-align:center; margin-top:16px; font-size:15px;"></p>
+
+<script>
+function cancelBooking(bookingId, btn) {
+    if (!confirm("Are you sure you want to cancel this booking?")) return;
+
+    btn.disabled = true;
+    btn.innerText = "Cancelling...";
+
+    fetch(`/api/bookings/${bookingId}/cancel`, {
+        method: "PATCH",
+        credentials: "same-origin"
+    })
+    .then(res => res.json())
+    .then(data => {
+        const msg = document.getElementById("message");
+        if (data.message) {
+            msg.style.color = "#4ade80";
+            msg.innerText = data.message;
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            msg.style.color = "#f87171";
+            msg.innerText = data.error;
+            btn.disabled = false;
+            btn.innerText = "Cancel Booking";
+        }
+    });
+}
+</script>
 
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-
