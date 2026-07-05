@@ -18,20 +18,44 @@
 document.getElementById("registerForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
+    const username = document.getElementById("username").value.trim()
+    const email    = document.getElementById("email").value.trim()
+    const password = document.getElementById("password").value
+    const msg      = document.getElementById("message")
+
+    // frontend validation before even hitting the server
+    if (username.length < 3) {
+        msg.style.color = "#f87171"
+        msg.innerText = "Username must be at least 3 characters"
+        return
+    }
+
+    if (password.length < 8) {
+        msg.style.color = "#f87171"
+        msg.innerText = "Password must be at least 8 characters"
+        return
+    }
+
     fetch("/api/register", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
-            username: document.getElementById("username").value,
-            email: document.getElementById("email").value,
-            password: document.getElementById("password").value
+            username: username,
+            email: email,
+            password: password
         })
     })
     .then(res => res.json())
     .then(data => {
-        document.getElementById("message").innerText = data.message || data.error;
         if (data.message) {
-            window.location.href = "/login";
+            msg.style.color = "#4ade80"
+            msg.innerText = data.message
+            setTimeout(() => {
+                window.location.href = "/login"
+            }, 1000)
+        } else {
+            msg.style.color = "#f87171"
+            msg.innerText = data.error
         }
     });
 });

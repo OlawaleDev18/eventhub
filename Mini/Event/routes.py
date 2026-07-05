@@ -8,13 +8,48 @@ events_bp = Blueprint('events', __name__)
 @events_bp.route("/api/events", methods=["POST"])
 def create_events():
     data = request.get_json() or {}
+
+    # validate required fields
+    title       = data.get("title", "").strip()
+    description = data.get("description", "").strip()
+    location    = data.get("location", "").strip()
+    category    = data.get("category", "").strip()
+    date        = data.get("date")
+    capacity    = data.get("capacity")
+
+    if not title:
+        return jsonify({"error": "Event title is required"}), 400
+
+    if not description:
+        return jsonify({"error": "Event description is required"}), 400
+
+    if not location:
+        return jsonify({"error": "Event location is required"}), 400
+
+    if not category:
+        return jsonify({"error": "Event category is required"}), 400
+
+    if not date:
+        return jsonify({"error": "Event date is required"}), 400
+
+    if not capacity or int(capacity) < 1:
+        return jsonify({"error": "Capacity must be at least 1"}), 400
+
+    if len(title) > 100:
+        return jsonify({"error": "Title must not exceed 100 characters"}), 400
+
+    try:
+        parsed_date = datetime.fromisoformat(date)
+    except ValueError:
+        return jsonify({"error": "Invalid date format. Use YYYY-MM-DDTHH:MM:SS"}), 400
+
     event = Event(
-        title=data.get("title"),
-        description=data.get("description"),
-        location=data.get("location"),
-        capacity=data.get("capacity"),
-        category=data.get("category"),
-        date=datetime.fromisoformat(data.get("date")),
+        title=title,
+        description=description,
+        location=location,
+        capacity=int(capacity),
+        category=category,
+        date=parsed_date,
         organiser_id=1
     )
     db.session.add(event)

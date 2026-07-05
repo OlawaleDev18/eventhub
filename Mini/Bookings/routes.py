@@ -8,20 +8,28 @@ bookings_bp = Blueprint('bookings_bp', __name__)
 @login_required
 def create_booking():
     data = request.get_json() or {}
-    event = Event.query.get_or_404(data["event_id"])
 
-    # check seat limit
+    event_id = data.get("event_id")
+    if not event_id:
+        return jsonify({"error": "Event ID is required"}), 400
+
+    try:
+        event_id = int(event_id)
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid event ID"}), 400
+
+    event = Event.query.get_or_404(event_id)
+
     confirmed_bookings = Booking.query.filter_by(
         event_id=event.id, status='confirmed'
     ).count()
     if confirmed_bookings >= event.capacity:
-        return jsonify({"error": "This event is fully booked"}), 400
+        return jsonify({"error": "Sorry, this event is fully booked"}), 400
 
-    # check duplicate booking
     existing = Booking.query.filter_by(
         user_id=current_user.id, event_id=event.id
     ).first()
-    if existing:
+    if existing and existing.status == 'confirmed':
         return jsonify({"error": "You have already booked this event"}), 400
 
     booking = Booking(user_id=current_user.id, event_id=event.id)
@@ -56,3 +64,4 @@ def event_bookings(event_id):
 def bookings_page():
     bookings = Booking.query.filter_by(user_id=current_user.id).all()
     return render_template("bookings.html", bookings=bookings)
+
