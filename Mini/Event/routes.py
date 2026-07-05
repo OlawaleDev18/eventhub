@@ -71,19 +71,75 @@ def events_page():
     return render_template("events.html", events=events, booked_event_ids=booked_event_ids)
 
 
+@events_bp.route("/admin/dashboard")
+@login_required
+def admin_dashboard():
+    if not current_user.is_organiser:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    from Mini.models import User, Event, Booking
+
+    # stats
+    total_users    = User.query.count()
+    total_events   = Event.query.count()
+    total_bookings = Booking.query.count()
+    confirmed      = Booking.query.filter_by(status='confirmed').count()
+    cancelled      = Booking.query.filter_by(status='cancelled').count()
+
+    # all events with their booking counts
+    events = Event.query.all()
+    events_data = []
+    for event in events:
+        confirmed_count = Booking.query.filter_by(
+            event_id=event.id, status='confirmed'
+        ).count()
+        cancelled_count = Booking.query.filter_by(
+            event_id=event.id, status='cancelled'
+        ).count()
+        slots_left = event.capacity - confirmed_count
+        events_data.append({
+            "event": event,
+            "confirmed": confirmed_count,
+            "cancelled": cancelled_count,
+            "slots_left": slots_left,
+            "full": slots_left <= 0
+        })
+
+    # all registered users
+    users = User.query.filter_by(is_organiser=False).all()
+
+    # recent bookings — last 10
+    recent_bookings = Booking.query.order_by(
+        Booking.booked_at.desc()
+    ).limit(10).all()
+
+    return render_template(
+        "admin_dashboard.html",
+        total_users=total_users,
+        total_events=total_events,
+        total_bookings=total_bookings,
+        confirmed=confirmed,
+        cancelled=cancelled,
+        events_data=events_data,
+        users=users,
+        recent_bookings=recent_bookings
+    )
+
+
+# keep the API version too for Thunderclient access
 @events_bp.route("/api/admin/stats")
 @login_required
 def admin_stats():
     if not current_user.is_organiser:
         return jsonify({"error": "Unauthorized"}), 403
-    
+
     from Mini.models import User, Event, Booking
-    total_users = User.query.count()
-    total_events = Event.query.count()
+    total_users    = User.query.count()
+    total_events   = Event.query.count()
     total_bookings = Booking.query.count()
-    confirmed = Booking.query.filter_by(status='confirmed').count()
-    cancelled = Booking.query.filter_by(status='cancelled').count()
-    
+    confirmed      = Booking.query.filter_by(status='confirmed').count()
+    cancelled      = Booking.query.filter_by(status='cancelled').count()
+
     return jsonify({
         "total_users": total_users,
         "total_events": total_events,

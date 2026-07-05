@@ -15,15 +15,18 @@
 
     <div>
         {% if current_user.is_authenticated %}
-            <a href="/dashboard">Dashboard</a>
-            <a href="/events/">Events</a>
-            <a href="/bookings">Bookings</a>
-            <button id="logoutBtn">Logout</button>
-        {% else %}
-            <a href="/">Home</a>
-            <a href="/register">Register</a>
-            <a href="/login">Login</a>
-        {% endif %}
+    <a href="/dashboard">Dashboard</a>
+    <a href="/events/">Events</a>
+    <a href="/bookings">Bookings</a>
+    {% if current_user.is_organiser %}
+        <a href="/admin/dashboard" style="color:#f59e0b;">⚙️ Admin</a>
+    {% endif %}
+    <button id="logoutBtn">Logout</button>
+{% else %}
+    <a href="/">Home</a>
+    <a href="/register">Register</a>
+    <a href="/login">Login</a>
+{% endif %}
     </div>
 </nav>
 

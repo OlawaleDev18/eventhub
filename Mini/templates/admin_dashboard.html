@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <div>
+        <h2>⚙️ Admin Dashboard</h2>
+        <p>Welcome back, {{ current_user.username }}. Here's everything happening on EventHub.</p>
+    </div>
+    <a href="/events/"><button>Browse Events</button></a>
+</div>
+
+<!-- STATS ROW -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info">
+            <div class="stat-num">{{ total_users }}</div>
+            <div class="stat-label">Registered Users</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-info">
+            <div class="stat-num">{{ total_events }}</div>
+            <div class="stat-label">Total Events</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+            <div class="stat-num">{{ confirmed }}</div>
+            <div class="stat-label">Confirmed Bookings</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">❌</div>
+        <div class="stat-info">
+            <div class="stat-num">{{ cancelled }}</div>
+            <div class="stat-label">Cancelled Bookings</div>
+        </div>
+    </div>
+</div>
+
+<!-- EVENTS TABLE -->
+<div class="card" style="margin-bottom: 24px;">
+    <div class="dash-card-header">
+        <h3>🎟️ All Events & Bookings</h3>
+        <span style="font-size:13px; color:#94a3b8;">{{ total_events }} events total</span>
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Capacity</th>
+                    <th>Confirmed</th>
+                    <th>Cancelled</th>
+                    <th>Slots Left</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in events_data %}
+                <tr>
+                    <td><strong>{{ item.event.title }}</strong></td>
+                    <td>{{ item.event.category }}</td>
+                    <td>{{ item.event.date.strftime('%b %d, %Y') }}</td>
+                    <td>{{ item.event.capacity }}</td>
+                    <td style="color:#4ade80;">{{ item.confirmed }}</td>
+                    <td style="color:#f87171;">{{ item.cancelled }}</td>
+                    <td>{{ item.slots_left }}</td>
+                    <td>
+                        {% if item.full %}
+                            <span class="status-badge cancelled">Full</span>
+                        {% else %}
+                            <span class="status-badge confirmed">Available</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- BOTTOM GRID — users + recent bookings -->
+<div class="dashboard-grid">
+
+    <!-- REGISTERED USERS -->
+    <div class="card">
+        <div class="dash-card-header">
+            <h3>👥 Registered Users</h3>
+            <span style="font-size:13px; color:#94a3b8;">{{ total_users }} total</span>
+        </div>
+        {% if users %}
+            {% for user in users %}
+            <div class="recent-booking-item">
+                <div>
+                    <strong>{{ user.username }}</strong>
+                    <p>{{ user.email }}</p>
+                </div>
+                <span style="font-size:12px; color:#94a3b8;">
+                    {{ user.bookings|length }} booking(s)
+                </span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>No users registered yet.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- RECENT BOOKINGS -->
+    <div class="card">
+        <div class="dash-card-header">
+            <h3>🕐 Recent Bookings</h3>
+            <span style="font-size:13px; color:#94a3b8;">Last 10</span>
+        </div>
+        {% if recent_bookings %}
+            {% for booking in recent_bookings %}
+            <div class="recent-booking-item">
+                <div>
+                    <strong>{{ booking.user.username }}</strong>
+                    <p>{{ booking.event.title }}</p>
+                    <p style="font-size:11px; color:#64748b;">
+                        {{ booking.booked_at.strftime('%b %d, %Y at %I:%M %p') }}
+                    </p>
+                </div>
+                <span class="status-badge {{ booking.status }}">
+                    {{ booking.status }}
+                </span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>No bookings yet.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
